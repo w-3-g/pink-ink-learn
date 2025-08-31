@@ -1,105 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Production-grade Pastel Pink Design System */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Core Pastel Pink Palette */
+    --background: 0 0% 5%;
+    --foreground: 325 15% 95%;
+    
+    /* Beautiful Pink Gradients */
+    --pink-lightest: 330 100% 98%;
+    --pink-lighter: 325 100% 94%;
+    --pink-light: 320 65% 87%;
+    --pink-medium: 315 60% 75%;
+    --pink-dark: 310 55% 60%;
+    --pink-darker: 305 50% 45%;
+    --pink-darkest: 300 45% 25%;
+    
+    /* Semantic Colors */
+    --primary: 315 60% 75%;
+    --primary-foreground: 300 45% 10%;
+    --primary-glow: 320 65% 87%;
+    
+    --secondary: 210 40% 15%;
+    --secondary-foreground: 325 15% 95%;
+    
+    --accent: 320 65% 87%;
+    --accent-foreground: 300 45% 15%;
+    
+    --muted: 210 40% 20%;
+    --muted-foreground: 315 10% 70%;
+    
+    --card: 0 0% 8%;
+    --card-foreground: 325 15% 95%;
+    
+    --border: 315 30% 25%;
+    --input: 315 20% 15%;
+    --ring: 315 60% 75%;
+    
+    /* Beautiful Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--pink-light)), hsl(var(--pink-medium)));
+    --gradient-secondary: linear-gradient(180deg, hsl(var(--pink-medium)), hsl(var(--pink-dark)));
+    --gradient-glow: linear-gradient(120deg, hsl(var(--pink-lighter)), hsl(var(--pink-light)), hsl(var(--pink-medium)));
+    --gradient-bg: radial-gradient(ellipse at center, hsl(0 0% 8%), hsl(0 0% 3%));
+    
+    /* Animations */
+    --animation-duration: 400ms;
+    --animation-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Shadows & Glows */
+    --shadow-glow: 0 0 20px hsl(var(--pink-light) / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--pink-medium) / 0.4);
+    --shadow-panel: 0 20px 60px -20px hsl(var(--pink-dark) / 0.5);
+    
+    --radius: 1.5rem;
   }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
+  
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-hidden;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gradient-bg);
+  }
+  
+  /* Custom Scrollbars */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--pink-medium) / 0.3);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--pink-dark) / 0.6);
+  }
+
+  /* Markdown Preview Styles */
+  .markdown-preview h1, 
+  .markdown-preview h2, 
+  .markdown-preview h3 {
+    border-bottom: 1px solid hsl(var(--border));
+    padding-bottom: 0.3em;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: hsl(var(--primary));
+  }
+  
+  .markdown-preview p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+  
+  .markdown-preview ul, 
+  .markdown-preview ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    list-style-position: outside;
+  }
+  
+  .markdown-preview code {
+    background-color: hsl(var(--muted));
+    color: hsl(var(--accent));
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  }
+  
+  .markdown-preview pre > code {
+    white-space: pre-wrap;
+  }
+  
+  .markdown-preview pre {
+    background-color: hsl(var(--card));
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .markdown-preview blockquote {
+    padding-left: 1em;
+    color: hsl(var(--muted-foreground));
+    border-left: 0.25em solid hsl(var(--primary));
+    margin-left: 0;
+    padding: 0.5rem 1rem;
+    background: hsl(var(--muted) / 0.3);
+    border-radius: 0.5rem;
+  }
+  
+  .markdown-preview a {
+    color: hsl(var(--primary));
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+  
+  .markdown-preview a:hover {
+    text-decoration: underline;
+    color: hsl(var(--primary-glow));
+  }
+
+  .markdown-preview ul li::marker,
+  .markdown-preview ol li::marker {
+    color: hsl(var(--primary));
+  }
+
+  .markdown-preview strong {
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .markdown-preview em {
+    color: hsl(var(--accent));
+    font-style: italic;
+  }
+
+  .markdown-preview table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  .markdown-preview th,
+  .markdown-preview td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem;
+    text-align: left;
+  }
+
+  .markdown-preview th {
+    background-color: hsl(var(--muted));
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  .markdown-preview input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: hsl(var(--primary));
   }
 }
