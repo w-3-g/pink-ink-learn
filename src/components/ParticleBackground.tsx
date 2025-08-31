@@ -31,7 +31,7 @@ export const ParticleBackground: React.FC = () => {
 
     const initParticles = () => {
       particlesRef.current = [];
-      const numberOfParticles = (canvas.width * canvas.height) / 9000;
+      const numberOfParticles = (canvas.width * canvas.height) / 15000;
       
       for (let i = 0; i < numberOfParticles; i++) {
         const size = Math.random() * 2 + 1;
@@ -94,7 +94,7 @@ export const ParticleBackground: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-50"
       style={{ pointerEvents: 'none' }}
     />
   );
