@@ -33,6 +33,7 @@ export const useMarkdownLessons = () => {
   const [userInput, setUserInput] = useState('');
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [completedPreviews, setCompletedPreviews] = useState<string[]>([]);
+  const [isEditorMode, setIsEditorMode] = useState(false);
 
   const parseMarkdown = useCallback((markdown: string): string => {
     try {
@@ -73,14 +74,28 @@ export const useMarkdownLessons = () => {
     }, 400);
   }, [currentLesson, parseMarkdown, loadNextRandomLesson]);
 
+  // Normalize text for comparison (handles multiline content)
+  const normalizeText = useCallback((text: string) => {
+    return text
+      // Normalize line endings
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      // Remove trailing spaces from each line
+      .split('\n')
+      .map(line => line.trimEnd())
+      .join('\n')
+      // Remove leading/trailing whitespace
+      .trim();
+  }, []);
+
   const handleInputChange = useCallback((value: string) => {
     setUserInput(value);
     
-    // Check if lesson is completed
-    if (currentLesson && value.trim() === currentLesson.code.trim()) {
+    // Check if lesson is completed (only in lesson mode)
+    if (!isEditorMode && currentLesson && normalizeText(value) === normalizeText(currentLesson.code)) {
       completeLesson();
     }
-  }, [currentLesson, completeLesson]);
+  }, [currentLesson, completeLesson, isEditorMode, normalizeText]);
 
   // Initialize with first lesson
   useEffect(() => {
@@ -91,13 +106,73 @@ export const useMarkdownLessons = () => {
 
   const currentPreview = parseMarkdown(userInput);
 
+  const toggleEditorMode = useCallback(() => {
+    setIsEditorMode(prev => !prev);
+    if (!isEditorMode) {
+      // Switching to editor mode - clear lesson state
+      setCurrentLesson(null);
+      setUserInput('');
+    } else {
+      // Switching back to lesson mode - load a lesson
+      loadNextRandomLesson();
+    }
+  }, [isEditorMode, loadNextRandomLesson]);
+
+  const downloadMarkdown = useCallback(() => {
+    const blob = new Blob([userInput], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'markdown-document.md';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [userInput]);
+
+  const addEmojis = useCallback(() => {
+    // Simple AI-like emoji insertion logic
+    const emojiMap: Record<string, string> = {
+      'hello': '👋',
+      'world': '🌍',
+      'code': '💻',
+      'javascript': '⚡',
+      'markdown': '📝',
+      'table': '📊',
+      'list': '📋',
+      'important': '⭐',
+      'link': '🔗',
+      'quote': '💬',
+      'task': '✅',
+      'work': '💼',
+      'great': '🎉',
+      'awesome': '🚀',
+      'creative': '🎨',
+      'fun': '🎯',
+      'modern': '✨',
+      'exciting': '🔥'
+    };
+
+    let enhancedText = userInput;
+    Object.entries(emojiMap).forEach(([word, emoji]) => {
+      const regex = new RegExp(`\\b${word}\\b`, 'gi');
+      enhancedText = enhancedText.replace(regex, `$& ${emoji}`);
+    });
+
+    setUserInput(enhancedText);
+  }, [userInput]);
+
   return {
     currentLesson,
     userInput,
     currentPreview,
     completedLessons,
     completedPreviews,
+    isEditorMode,
     handleInputChange,
-    loadNextRandomLesson
+    loadNextRandomLesson,
+    toggleEditorMode,
+    downloadMarkdown,
+    addEmojis
   };
 };
