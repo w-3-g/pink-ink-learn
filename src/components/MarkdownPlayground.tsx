@@ -12,10 +12,12 @@ export const MarkdownPlayground: React.FC = () => {
     completedLessons,
     completedPreviews,
     isEditorMode,
+    isAddingEmojis,
     handleInputChange,
     toggleEditorMode,
     downloadMarkdown,
-    addEmojis
+    addEmojis,
+    clearUserInput
   } = useMarkdownLessons();
 
   const [completingLesson, setCompletingLesson] = useState<{ code: string; preview: string } | null>(null);
@@ -84,6 +86,8 @@ export const MarkdownPlayground: React.FC = () => {
             isEditorMode={isEditorMode}
             onDownload={downloadMarkdown}
             onAddEmojis={addEmojis}
+            isAddingEmojis={isAddingEmojis}
+            onClear={clearUserInput}
           />
 
           {/* Right Panel: Preview */}

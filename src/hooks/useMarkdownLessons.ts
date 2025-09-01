@@ -34,6 +34,8 @@ export const useMarkdownLessons = () => {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [completedPreviews, setCompletedPreviews] = useState<string[]>([]);
   const [isEditorMode, setIsEditorMode] = useState(false);
+  const [isAddingEmojis, setIsAddingEmojis] = useState(false);
+  const [lessonIndex, setLessonIndex] = useState(0);
 
   const parseMarkdown = useCallback((markdown: string): string => {
     try {
@@ -48,15 +50,18 @@ export const useMarkdownLessons = () => {
     }
   }, []);
 
-  const loadNextRandomLesson = useCallback(() => {
-    let nextLesson: Lesson;
-    do {
-      nextLesson = lessonPool[Math.floor(Math.random() * lessonPool.length)];
-    } while (lessonPool.length > 1 && nextLesson === currentLesson);
-    
-    setCurrentLesson(nextLesson);
+  const loadLesson = useCallback((index: number) => {
+    if (index < lessonPool.length) {
+      setCurrentLesson(lessonPool[index]);
+    } else {
+      // All lessons are completed
+      setCurrentLesson({
+        instruction: "You've completed all lessons! Feel free to use the editor.",
+        code: "🎉"
+      });
+    }
     setUserInput('');
-  }, [currentLesson]);
+  }, []);
 
   const completeLesson = useCallback(() => {
     if (!currentLesson) return;
@@ -64,15 +69,13 @@ export const useMarkdownLessons = () => {
     const completedCode = currentLesson.code;
     const completedPreview = parseMarkdown(completedCode);
 
-    // Add completed lesson to the lists (prepend for reverse chronological order)
     setCompletedLessons(prev => [completedCode, ...prev]);
     setCompletedPreviews(prev => [completedPreview, ...prev]);
 
-    // Load next lesson after a brief delay for animation
     setTimeout(() => {
-      loadNextRandomLesson();
+      setLessonIndex(prev => prev + 1);
     }, 400);
-  }, [currentLesson, parseMarkdown, loadNextRandomLesson]);
+  }, [currentLesson, parseMarkdown]);
 
   // Normalize text for comparison (handles multiline content)
   const normalizeText = useCallback((text: string) => {
@@ -97,26 +100,31 @@ export const useMarkdownLessons = () => {
     }
   }, [currentLesson, completeLesson, isEditorMode, normalizeText]);
 
-  // Initialize with first lesson
+  // Load lesson when lessonIndex changes
   useEffect(() => {
-    if (!currentLesson) {
-      loadNextRandomLesson();
+    if (!isEditorMode) {
+      loadLesson(lessonIndex);
     }
-  }, [currentLesson, loadNextRandomLesson]);
+  }, [lessonIndex, isEditorMode, loadLesson]);
 
   const currentPreview = parseMarkdown(userInput);
 
   const toggleEditorMode = useCallback(() => {
-    setIsEditorMode(prev => !prev);
-    if (!isEditorMode) {
-      // Switching to editor mode - clear lesson state
-      setCurrentLesson(null);
+    const newIsEditorMode = !isEditorMode;
+    setIsEditorMode(newIsEditorMode);
+
+    if (newIsEditorMode) {
+      // Switching to editor mode
       setUserInput('');
     } else {
-      // Switching back to lesson mode - load a lesson
-      loadNextRandomLesson();
+      // Switching back to lesson mode
+      setLessonIndex(0); // Reset to the first lesson
     }
-  }, [isEditorMode, loadNextRandomLesson]);
+  }, [isEditorMode]);
+
+  const clearUserInput = useCallback(() => {
+    setUserInput('');
+  }, []);
 
   const downloadMarkdown = useCallback(() => {
     const blob = new Blob([userInput], { type: 'text/markdown' });
@@ -130,36 +138,72 @@ export const useMarkdownLessons = () => {
     URL.revokeObjectURL(url);
   }, [userInput]);
 
-  const addEmojis = useCallback(() => {
-    // Simple AI-like emoji insertion logic
-    const emojiMap: Record<string, string> = {
-      'hello': '👋',
-      'world': '🌍',
-      'code': '💻',
-      'javascript': '⚡',
-      'markdown': '📝',
-      'table': '📊',
-      'list': '📋',
-      'important': '⭐',
-      'link': '🔗',
-      'quote': '💬',
-      'task': '✅',
-      'work': '💼',
-      'great': '🎉',
-      'awesome': '🚀',
-      'creative': '🎨',
-      'fun': '🎯',
-      'modern': '✨',
-      'exciting': '🔥'
-    };
+  const addEmojis = useCallback(async () => {
+    if (!userInput) return;
 
-    let enhancedText = userInput;
-    Object.entries(emojiMap).forEach(([word, emoji]) => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      enhancedText = enhancedText.replace(regex, `$& ${emoji}`);
-    });
+    setIsAddingEmojis(true);
 
-    setUserInput(enhancedText);
+    try {
+      // First, try the private server
+      const response = await fetch('http://123.123.123.26:1234/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: 'system', content: 'You are an expert in using emojis. Your task is to take the user\'s text and add relevant emojis to it. Do not add too many emojis. Just add a few where they make sense. Only return the modified text, without any other comments or explanations. Do not wrap the response in quotes.' },
+            { role: 'user', content: userInput }
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Private server failed, trying OpenRouter...');
+      }
+
+      const data = await response.json();
+      const enhancedText = data.choices[0].message.content.trim();
+      setUserInput(enhancedText);
+
+    } catch (error) {
+      console.error(error);
+      // If private server fails, fallback to OpenRouter
+      try {
+        const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://lovable.dev/projects/05c44b27-96d7-4a2a-bf49-15a14be85d46',
+            'X-Title': 'Markdown Playground'
+          },
+          body: JSON.stringify({
+            model: "google/gemma-7b-it:free",
+            messages: [
+              { role: 'system', content: 'You are an expert in using emojis. Your task is to take the user\'s text and add relevant emojis to it. Do not add too many emojis. Just add a few where they make sense. Only return the modified text, without any other comments or explanations. Do not wrap the response in quotes.' },
+              { role: 'user', content: userInput }
+            ],
+          })
+        });
+
+        if (!openRouterResponse.ok) {
+          const errorText = await openRouterResponse.text();
+          console.error('OpenRouter API Error:', errorText);
+          throw new Error(`OpenRouter API request failed with status: ${openRouterResponse.status}`);
+        }
+
+        const openRouterData = await openRouterResponse.json();
+        const enhancedText = openRouterData.choices[0].message.content.trim();
+        setUserInput(enhancedText);
+
+      } catch (openRouterError) {
+        console.error('Error with OpenRouter fallback:', openRouterError);
+        // Here you could add a user-facing error message, e.g., via a toast notification
+        alert('Could not add emojis. Both primary and fallback services failed.');
+      }
+    } finally {
+      setIsAddingEmojis(false);
+    }
   }, [userInput]);
 
   return {
@@ -169,10 +213,11 @@ export const useMarkdownLessons = () => {
     completedLessons,
     completedPreviews,
     isEditorMode,
+    isAddingEmojis,
     handleInputChange,
-    loadNextRandomLesson,
     toggleEditorMode,
     downloadMarkdown,
-    addEmojis
+    addEmojis,
+    clearUserInput
   };
 };

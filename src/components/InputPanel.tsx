@@ -15,6 +15,8 @@ interface InputPanelProps {
   isEditorMode?: boolean;
   onDownload?: () => void;
   onAddEmojis?: () => void;
+  isAddingEmojis?: boolean;
+  onClear?: () => void;
 }
 
 export const InputPanel: React.FC<InputPanelProps> = ({
@@ -25,7 +27,9 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   onLessonComplete,
   isEditorMode = false,
   onDownload,
-  onAddEmojis
+  onAddEmojis,
+  isAddingEmojis = false,
+  onClear
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showCompletion, setShowCompletion] = useState<Lesson | null>(null);
@@ -93,12 +97,34 @@ export const InputPanel: React.FC<InputPanelProps> = ({
             </button>
             <button
               onClick={onAddEmojis}
-              className="flex items-center gap-2 px-3 py-2 bg-accent/10 hover:bg-accent/20 border border-accent/20 rounded-lg text-accent font-medium transition-all duration-300 text-sm"
+              disabled={isAddingEmojis}
+              className="flex items-center gap-2 px-3 py-2 bg-accent/10 hover:bg-accent/20 border border-accent/20 rounded-lg text-accent font-medium transition-all duration-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAddingEmojis ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  ✨ Add Emojis
+                </>
+              )}
+            </button>
+            <button
+              onClick={onClear}
+              className="flex items-center gap-2 px-3 py-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 rounded-lg text-destructive font-medium transition-all duration-300 text-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              ✨ Add Emojis
+              Clear
             </button>
           </div>
         )}
