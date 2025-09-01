@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "//": "The --host flag is added to force IPv4 and prevent EAFNOSUPPORT errors in some environments.",
+    "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

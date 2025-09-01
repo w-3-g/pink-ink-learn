@@ -143,11 +143,15 @@ export const useMarkdownLessons = () => {
 
     setIsAddingEmojis(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+
     try {
       // First, try the private server
       const response = await fetch('http://123.123.123.26:1234/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
           messages: [
@@ -158,6 +162,8 @@ export const useMarkdownLessons = () => {
         }),
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
         throw new Error('Private server failed, trying OpenRouter...');
       }
@@ -167,12 +173,14 @@ export const useMarkdownLessons = () => {
       setUserInput(enhancedText);
 
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error(error);
       // If private server fails, fallback to OpenRouter
       try {
         const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
           headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': 'https://lovable.dev/projects/05c44b27-96d7-4a2a-bf49-15a14be85d46',
             'X-Title': 'Markdown Playground'
@@ -198,8 +206,7 @@ export const useMarkdownLessons = () => {
 
       } catch (openRouterError) {
         console.error('Error with OpenRouter fallback:', openRouterError);
-        // Here you could add a user-facing error message, e.g., via a toast notification
-        alert('Could not add emojis. Both primary and fallback services failed.');
+        console.error('Could not add emojis. Both primary and fallback services failed.');
       }
     } finally {
       setIsAddingEmojis(false);
