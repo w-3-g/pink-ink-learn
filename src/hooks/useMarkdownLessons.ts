@@ -36,6 +36,7 @@ export const useMarkdownLessons = () => {
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isAddingEmojis, setIsAddingEmojis] = useState(false);
   const [lessonIndex, setLessonIndex] = useState(0);
+  const [enhancedMarkdown, setEnhancedMarkdown] = useState<string | null>(null);
 
   const parseMarkdown = useCallback((markdown: string): string => {
     try {
@@ -93,6 +94,7 @@ export const useMarkdownLessons = () => {
 
   const handleInputChange = useCallback((value: string) => {
     setUserInput(value);
+    setEnhancedMarkdown(null); // Reset emoji preview on user input
     
     // Check if lesson is completed (only in lesson mode)
     if (!isEditorMode && currentLesson && normalizeText(value) === normalizeText(currentLesson.code)) {
@@ -107,7 +109,7 @@ export const useMarkdownLessons = () => {
     }
   }, [lessonIndex, isEditorMode, loadLesson]);
 
-  const currentPreview = parseMarkdown(userInput);
+  const currentPreview = parseMarkdown(enhancedMarkdown ?? userInput);
 
   const toggleEditorMode = useCallback(() => {
     const newIsEditorMode = !isEditorMode;
@@ -125,6 +127,16 @@ export const useMarkdownLessons = () => {
   const clearUserInput = useCallback(() => {
     setUserInput('');
   }, []);
+
+  const skipLesson = useCallback(() => {
+    setLessonIndex(prev => prev + 1);
+  }, []);
+
+  const showSolution = useCallback(() => {
+    if (currentLesson) {
+      setUserInput(currentLesson.code);
+    }
+  }, [currentLesson]);
 
   const downloadMarkdown = useCallback(() => {
     const blob = new Blob([userInput], { type: 'text/markdown' });
@@ -170,7 +182,7 @@ export const useMarkdownLessons = () => {
 
       const data = await response.json();
       const enhancedText = data.choices[0].message.content.trim();
-      setUserInput(enhancedText);
+      setEnhancedMarkdown(enhancedText);
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -202,7 +214,7 @@ export const useMarkdownLessons = () => {
 
         const openRouterData = await openRouterResponse.json();
         const enhancedText = openRouterData.choices[0].message.content.trim();
-        setUserInput(enhancedText);
+        setEnhancedMarkdown(enhancedText);
 
       } catch (openRouterError) {
         console.error('Error with OpenRouter fallback:', openRouterError);
@@ -225,6 +237,8 @@ export const useMarkdownLessons = () => {
     toggleEditorMode,
     downloadMarkdown,
     addEmojis,
-    clearUserInput
+    clearUserInput,
+    skipLesson,
+    showSolution
   };
 };
