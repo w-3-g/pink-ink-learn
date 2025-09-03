@@ -3,41 +3,62 @@ import { CompletionAnimation } from './CompletionAnimation';
 
 interface PreviewPanelProps {
   htmlContent: string;
+  markdownContent: string;
   completedPreviews: string[];
   completedLesson?: { code: string; preview: string } | null;
   onAnimationComplete?: () => void;
+  onDownload?: () => void;
   isEditorMode?: boolean;
 }
 
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   htmlContent,
+  markdownContent,
   completedPreviews,
   completedLesson,
   onAnimationComplete,
+  onDownload,
   isEditorMode = false
 }) => {
-  const [isCopied, setIsCopied] = useState(false);
+  const [isHtmlCopied, setIsHtmlCopied] = useState(false);
+  const [isMarkdownCopied, setIsMarkdownCopied] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopyHtml = () => {
     navigator.clipboard.writeText(htmlContent).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      setIsHtmlCopied(true);
+      setTimeout(() => setIsHtmlCopied(false), 2000);
+    });
+  };
+
+  const handleCopyMarkdown = () => {
+    navigator.clipboard.writeText(markdownContent).then(() => {
+      setIsMarkdownCopied(true);
+      setTimeout(() => setIsMarkdownCopied(false), 2000);
     });
   };
 
   return (
-    <div className="relative bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
+    <div className="relative flex flex-col bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
       {/* Editor Mode Toolbar */}
       {isEditorMode && (
-        <div className="absolute top-4 right-4 z-20">
+        <div className="absolute top-4 right-4 z-20 flex gap-2">
           <button
-            onClick={handleCopy}
+            onClick={handleCopyMarkdown}
             className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg text-primary font-medium transition-all duration-300 text-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            {isCopied ? 'Copied!' : 'Copy HTML'}
+            {isMarkdownCopied ? 'Copied!' : 'Copy Markdown'}
+          </button>
+          <button
+            onClick={handleCopyHtml}
+            className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg text-primary font-medium transition-all duration-300 text-sm"
+          >
+            {isHtmlCopied ? 'Copied!' : 'Copy HTML'}
+          </button>
+           <button
+            onClick={onDownload}
+            className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg text-primary font-medium transition-all duration-300 text-sm"
+          >
+            Download .md
           </button>
         </div>
       )}
@@ -59,7 +80,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
       )}
 
       {/* Current preview */}
-      <div className="p-6 flex-grow overflow-y-auto custom-scrollbar markdown-preview relative min-h-[400px]">
+      <div className="p-6 flex-grow overflow-y-auto hide-scrollbar markdown-preview relative min-h-0">
         <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
 
         {/* Completion Animation */}

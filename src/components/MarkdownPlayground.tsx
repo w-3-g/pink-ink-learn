@@ -3,6 +3,8 @@ import { ParticleBackground } from './ParticleBackground';
 import { InputPanel } from './InputPanel';
 import { PreviewPanel } from './PreviewPanel';
 import { useMarkdownLessons } from '../hooks/useMarkdownLessons';
+import { ProgressBar } from './ProgressBar';
+import { TextStats } from './TextStats';
 
 export const MarkdownPlayground: React.FC = () => {
   const {
@@ -17,7 +19,9 @@ export const MarkdownPlayground: React.FC = () => {
     toggleEditorMode,
     downloadMarkdown,
     addEmojis,
-    clearUserInput
+    clearUserInput,
+    skipLesson,
+    showSolution
   } = useMarkdownLessons();
 
   const [completingLesson, setCompletingLesson] = useState<{ code: string; preview: string } | null>(null);
@@ -88,17 +92,23 @@ export const MarkdownPlayground: React.FC = () => {
             onAddEmojis={addEmojis}
             isAddingEmojis={isAddingEmojis}
             onClear={clearUserInput}
+            onSkip={skipLesson}
+            onShowSolution={showSolution}
           />
 
           {/* Right Panel: Preview */}
           <PreviewPanel
             htmlContent={currentPreview}
+            markdownContent={userInput}
+            onDownload={downloadMarkdown}
             completedPreviews={completedPreviews}
             completedLesson={completingLesson}
             onAnimationComplete={handlePreviewAnimationComplete}
             isEditorMode={isEditorMode}
           />
         </main>
+        {isAddingEmojis && <ProgressBar />}
+        <TextStats text={userInput} />
       </div>
     </div>
   );

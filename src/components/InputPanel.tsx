@@ -17,6 +17,8 @@ interface InputPanelProps {
   onAddEmojis?: () => void;
   isAddingEmojis?: boolean;
   onClear?: () => void;
+  onSkip?: () => void;
+  onShowSolution?: () => void;
 }
 
 export const InputPanel: React.FC<InputPanelProps> = ({
@@ -29,7 +31,9 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   onDownload,
   onAddEmojis,
   isAddingEmojis = false,
-  onClear
+  onClear,
+  onSkip,
+  onShowSolution
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showCompletion, setShowCompletion] = useState<Lesson | null>(null);
@@ -66,13 +70,13 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   };
 
   return (
-    <div className="relative bg-card/80 backdrop-blur-sm rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
+    <div className="relative flex flex-col bg-card/80 backdrop-blur-sm rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
       {/* Glowing border effect */}
       <div className="absolute inset-0 rounded-3xl p-[2px] bg-gradient-glow opacity-30 -z-10" />
       
       {/* Completed lessons - only show in lesson mode */}
       {!isEditorMode && (
-        <div className="p-6 text-muted-foreground overflow-y-auto custom-scrollbar max-h-32">
+        <div className="flex-shrink-0 p-6 text-muted-foreground overflow-y-auto custom-scrollbar max-h-40">
           {completedLessons.map((lesson, index) => (
             <pre key={index} className="mb-4 whitespace-pre-wrap opacity-50 font-manrope text-base">
               {lesson}
@@ -82,10 +86,10 @@ export const InputPanel: React.FC<InputPanelProps> = ({
       )}
 
       {/* Current lesson and input area */}
-      <div className="flex-grow flex flex-col p-6 pt-0 relative min-h-[400px]">
+      <div className="flex-grow flex flex-col p-6 pt-0 relative min-h-0">
         {/* Editor Mode Toolbar */}
         {isEditorMode && (
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4 mt-6">
             <button
               onClick={onDownload}
               className="flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg text-primary font-medium transition-all duration-300 text-sm"
@@ -131,14 +135,20 @@ export const InputPanel: React.FC<InputPanelProps> = ({
 
         {/* Lesson instructions - only show in lesson mode */}
         {!isEditorMode && currentLesson && (
-          <>
+          <div className="mb-4">
             <p className="mb-2 text-primary animate-fade-in-slide-up font-manrope font-medium text-base">
               {currentLesson.instruction}
             </p>
-            <code className="text-foreground bg-primary/10 px-3 py-1.5 rounded-lg mb-4 inline-block animate-fade-in-slide-up animate-pulse-glow self-start font-manrope text-base">
-              {currentLesson.code}
-            </code>
-          </>
+            <div className="flex items-center gap-4">
+              <code className="text-foreground bg-primary/10 px-3 py-1.5 rounded-lg inline-block animate-fade-in-slide-up animate-pulse-glow self-start font-manrope text-base">
+                {currentLesson.code}
+              </code>
+              <div className="flex gap-2">
+                <button onClick={onShowSolution} className="text-xs font-semibold text-primary/70 hover:text-primary transition-colors">Show Solution</button>
+                <button onClick={onSkip} className="text-xs font-semibold text-primary/70 hover:text-primary transition-colors">Skip</button>
+              </div>
+            </div>
+          </div>
         )}
 
         <textarea
