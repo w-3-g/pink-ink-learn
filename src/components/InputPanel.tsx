@@ -70,13 +70,13 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   };
 
   return (
-    <div className="relative bg-card/80 backdrop-blur-sm rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
+    <div className="relative flex flex-col bg-card/80 backdrop-blur-sm rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
       {/* Glowing border effect */}
       <div className="absolute inset-0 rounded-3xl p-[2px] bg-gradient-glow opacity-30 -z-10" />
       
       {/* Completed lessons - only show in lesson mode */}
       {!isEditorMode && (
-        <div className="p-6 text-muted-foreground overflow-y-auto custom-scrollbar max-h-40">
+        <div className="flex-shrink-0 p-6 text-muted-foreground overflow-y-auto custom-scrollbar max-h-40">
           {completedLessons.map((lesson, index) => (
             <pre key={index} className="mb-4 whitespace-pre-wrap opacity-50 font-manrope text-base">
               {lesson}
@@ -86,7 +86,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
       )}
 
       {/* Current lesson and input area */}
-      <div className="flex-grow flex flex-col p-6 pt-0 relative min-h-[400px]">
+      <div className="flex-grow flex flex-col p-6 pt-0 relative min-h-0">
         {/* Editor Mode Toolbar */}
         {isEditorMode && (
           <div className="flex gap-2 mb-4 mt-6">

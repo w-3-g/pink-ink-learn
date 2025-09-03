@@ -36,7 +36,6 @@ export const useMarkdownLessons = () => {
   const [isEditorMode, setIsEditorMode] = useState(false);
   const [isAddingEmojis, setIsAddingEmojis] = useState(false);
   const [lessonIndex, setLessonIndex] = useState(0);
-  const [enhancedMarkdown, setEnhancedMarkdown] = useState<string | null>(null);
 
   const parseMarkdown = useCallback((markdown: string): string => {
     try {
@@ -94,7 +93,6 @@ export const useMarkdownLessons = () => {
 
   const handleInputChange = useCallback((value: string) => {
     setUserInput(value);
-    setEnhancedMarkdown(null); // Reset emoji preview on user input
     
     // Check if lesson is completed (only in lesson mode)
     if (!isEditorMode && currentLesson && normalizeText(value) === normalizeText(currentLesson.code)) {
@@ -109,7 +107,7 @@ export const useMarkdownLessons = () => {
     }
   }, [lessonIndex, isEditorMode, loadLesson]);
 
-  const currentPreview = parseMarkdown(enhancedMarkdown ?? userInput);
+  const currentPreview = parseMarkdown(userInput);
 
   const toggleEditorMode = useCallback(() => {
     const newIsEditorMode = !isEditorMode;
@@ -182,7 +180,7 @@ export const useMarkdownLessons = () => {
 
       const data = await response.json();
       const enhancedText = data.choices[0].message.content.trim();
-      setEnhancedMarkdown(enhancedText);
+      setUserInput(enhancedText);
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -198,7 +196,7 @@ export const useMarkdownLessons = () => {
             'X-Title': 'Markdown Playground'
           },
           body: JSON.stringify({
-            model: "google/gemma-7b-it:free",
+            model: "openai/gpt-oss-20b:free",
             messages: [
               { role: 'system', content: 'You are an expert in using emojis. Your task is to take the user\'s text and add relevant emojis to it. Do not add too many emojis. Just add a few where they make sense. Only return the modified text, without any other comments or explanations. Do not wrap the response in quotes.' },
               { role: 'user', content: userInput }
@@ -214,7 +212,7 @@ export const useMarkdownLessons = () => {
 
         const openRouterData = await openRouterResponse.json();
         const enhancedText = openRouterData.choices[0].message.content.trim();
-        setEnhancedMarkdown(enhancedText);
+        setUserInput(enhancedText);
 
       } catch (openRouterError) {
         console.error('Error with OpenRouter fallback:', openRouterError);

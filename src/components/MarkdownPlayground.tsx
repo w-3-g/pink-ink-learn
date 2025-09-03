@@ -3,6 +3,7 @@ import { ParticleBackground } from './ParticleBackground';
 import { InputPanel } from './InputPanel';
 import { PreviewPanel } from './PreviewPanel';
 import { useMarkdownLessons } from '../hooks/useMarkdownLessons';
+import { ProgressBar } from './ProgressBar';
 import { TextStats } from './TextStats';
 
 export const MarkdownPlayground: React.FC = () => {
@@ -106,6 +107,7 @@ export const MarkdownPlayground: React.FC = () => {
             isEditorMode={isEditorMode}
           />
         </main>
+        {isAddingEmojis && <ProgressBar />}
         <TextStats text={userInput} />
       </div>
     </div>

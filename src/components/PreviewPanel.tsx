@@ -38,7 +38,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   };
 
   return (
-    <div className="relative bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
+    <div className="relative flex flex-col bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-3xl border border-pink-medium/20 shadow-panel overflow-hidden">
       {/* Editor Mode Toolbar */}
       {isEditorMode && (
         <div className="absolute top-4 right-4 z-20 flex gap-2">
@@ -80,7 +80,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
       )}
 
       {/* Current preview */}
-      <div className="p-6 flex-grow overflow-y-auto hide-scrollbar markdown-preview relative min-h-[400px]">
+      <div className="p-6 flex-grow overflow-y-auto hide-scrollbar markdown-preview relative min-h-0">
         <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
 
         {/* Completion Animation */}
